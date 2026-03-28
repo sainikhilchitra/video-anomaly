@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.venv/
+venv/
+
+# Node.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Next.js
+.next/
+out/
+build/
+
+# IDEs/OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+Thumbs.db
+desktop.ini
+
+# Project Specific
+scripts/runs/
+scripts/testing_avenue/
+scripts/testing_ucsd_ped2/
+scripts/boxed_videos/
+scripts/boxed_videos_avenue_attention/
+backend/.env
+backend/.env.local
+backend/checkpoint_*.pth
+!scripts/*.pth
