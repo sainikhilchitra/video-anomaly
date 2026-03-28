@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --primary: #06b6d4;
+  --primary-foreground: #ffffff;
+  --accent: #ef4444;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--background)] text-[var(--foreground)] antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  }
+
+  ::selection {
+    background-color: rgb(6 182 212 / 0.3);
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-zinc-900/50 backdrop-blur-md border border-zinc-800 rounded-xl overflow-hidden;
+  }
+  
+  .glow-cyan {
+    box-shadow: 0 0 20px -5px rgba(6, 182, 212, 0.3);
+  }
+  
+  .glow-red {
+    box-shadow: 0 0 20px -5px rgba(239, 68, 68, 0.3);
+  }
+}
+
+.scanline {
+  width: 100%;
+  height: 2px;
+  background: rgba(6, 182, 212, 0.1);
+  opacity: 0.5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: scanline 4s linear infinite;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@keyframes scanline {
+  0% { top: 0% }
+  100% { top: 100% }
+}
+
+.radar-sweep {
+  background: conic-gradient(from 0deg at 50% 50%, rgba(6, 182, 212, 0.1) 0deg, transparent 90deg);
+  animation: radar-sweep 4s linear infinite;
+}
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg) }
+  to { transform: rotate(360deg) }
+}
