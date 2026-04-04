@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 
 # =========================
-# ARCHITECTURE (UNCHANGED)
+# ARCHITECTURE
 # =========================
 
 class CNNEncoder(nn.Module):

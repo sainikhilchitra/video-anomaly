@@ -1,4 +1,10 @@
+gradio==4.36.1
+huggingface_hub==0.24.6
+fastapi==0.112.2
+uvicorn==0.30.6
+pydantic<2.10.0
 torch
 torchvision
 numpy
 pillow
+opencv-python
