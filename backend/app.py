@@ -43,59 +43,61 @@ async def websocket_endpoint(websocket: WebSocket):
     
     try:
         while True:
-            # Receive data from frontend
-            data_str = await websocket.receive_text()
-            data = json.loads(data_str)
-            
-            base64_image = data.get("image")
-            if not base64_image:
+            try:
+                # Receive data from frontend
+                data_str = await websocket.receive_text()
+                data = json.loads(data_str)
+                
+                base64_image = data.get("image")
+                if not base64_image:
+                    continue
+                
+                # Decode and append to sliding window buffer
+                tensor = decode_image(base64_image)
+                buffer.append(tensor)
+                
+                # Keep only the latest 5 frames
+                if len(buffer) > SEQUENCE_LENGTH:
+                    buffer.pop(0)
+                    
+                # If we have enough frames, predict
+                if len(buffer) == SEQUENCE_LENGTH:
+                    # Shape required: (Batch=1, Seq=5, C, H, W)
+                    frames_tensor = torch.stack(buffer).unsqueeze(0).to(handler.device)
+                    
+                    raw_score = handler.predict_sequence(frames_tensor)
+                    
+                    # Multiply the score by 10 to increase the value and make the warning less strict,
+                    # capping it at 1.0 so frontend percentages don't exceed 100%
+                    score = min(float(raw_score) * 10.0, 1.0)
+                    
+                    # Use dynamic threshold from frontend (defaults to 0.8 if missing)
+                    threshold = float(data.get("threshold", 0.8))
+                    is_anomaly = score > threshold
+                    
+                    await websocket.send_json({
+                        "score": float(score),
+                        "is_anomaly": bool(is_anomaly),
+                        "timestamp": data.get("timestamp")
+                    })
+                else:
+                    # Still building buffer, send a neutral 0 score 
+                    await websocket.send_json({
+                        "score": 0.0,
+                        "is_anomaly": False,
+                        "msg": "Buffering initial frames...",
+                        "buffer_size": len(buffer)
+                    })
+            except Exception as e:
+                print(f"Error processing frame: {e}")
+                try:
+                    await websocket.send_json({"error": str(e)})
+                except:
+                    pass
                 continue
-            
-            # Decode and append to sliding window buffer
-            tensor = decode_image(base64_image)
-            buffer.append(tensor)
-            
-            # Keep only the latest 5 frames
-            if len(buffer) > SEQUENCE_LENGTH:
-                buffer.pop(0)
-                
-            # If we have enough frames, predict
-            if len(buffer) == SEQUENCE_LENGTH:
-                # Shape required: (Batch=1, Seq=5, C, H, W)
-                frames_tensor = torch.stack(buffer).unsqueeze(0).to(handler.device)
-                
-                raw_score = handler.predict_sequence(frames_tensor)
-                
-                # Multiply the score by 10 to increase the value and make the warning less strict,
-                # capping it at 1.0 so frontend percentages don't exceed 100%
-                score = min(float(raw_score) * 5.0, 1.0)
-                
-                # Use dynamic threshold from frontend (defaults to 0.8 if missing)
-                threshold = float(data.get("threshold", 0.8))
-                is_anomaly = score > threshold
-                
-                await websocket.send_json({
-                    "score": float(score),
-                    "is_anomaly": bool(is_anomaly),
-                    "timestamp": data.get("timestamp")
-                })
-            else:
-                # Still building buffer, send a neutral 0 score 
-                await websocket.send_json({
-                    "score": 0.0,
-                    "is_anomaly": False,
-                    "msg": "Buffering initial frames...",
-                    "buffer_size": len(buffer)
-                })
                 
     except WebSocketDisconnect:
         print("Frontend disconnected.")
-    except Exception as e:
-        print(f"Error in websocket loop: {e}")
-        try:
-            await websocket.send_json({"error": str(e)})
-        except:
-            pass
 
 @app.get("/")
 def read_root():
