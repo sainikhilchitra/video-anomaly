@@ -1,6 +1,6 @@
 "use client";
 
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area } from "recharts";
+import { ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip, AreaChart, Area, ReferenceLine } from "recharts";
 import { Activity } from "lucide-react";
 
 interface AnomalyChartProps {
@@ -10,13 +10,13 @@ interface AnomalyChartProps {
 
 export function AnomalyChart({ data, threshold }: AnomalyChartProps) {
   return (
-    <div className="glass-card p-4 h-full flex flex-col">
+    <div className="glass-card p-4 flex flex-col h-[250px]">
       <div className="flex items-center gap-2 mb-4 text-cyan-400 font-mono tracking-wider">
         <Activity className="w-4 h-4" />
         <span className="text-xs uppercase">Anomaly pulse detector</span>
       </div>
 
-      <div className="flex-1 w-full min-h-[200px]">
+      <div className="flex-1 w-full min-h-[180px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data}>
             <defs>
@@ -48,14 +48,11 @@ export function AnomalyChart({ data, threshold }: AnomalyChartProps) {
                 fill="url(#colorScore)"
                 isAnimationActive={false}
             />
-            {/* Threshold Line */}
-            <Line 
-                type="monotone" 
-                dataKey={() => threshold} 
+            <ReferenceLine 
+                y={threshold} 
                 stroke="#ef4444" 
                 strokeDasharray="5 5" 
-                strokeWidth={1}
-                dot={false}
+                label={{ value: 'ALERT', position: 'right', fill: '#ef4444', fontSize: 8 }} 
             />
           </AreaChart>
         </ResponsiveContainer>
