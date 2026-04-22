@@ -51,9 +51,9 @@ export default function Home() {
 
   const handleFrame = useCallback((base64: string) => {
     if (isReady) {
-      send({ image: base64, timestamp: Date.now() });
+      send({ image: base64, timestamp: Date.now(), threshold: threshold });
     }
-  }, [isReady, send]);
+  }, [isReady, send, threshold]);
 
   const handleRecalibrate = () => {
     setAnomalyData([]);

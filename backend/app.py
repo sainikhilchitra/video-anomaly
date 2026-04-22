@@ -64,10 +64,15 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Shape required: (Batch=1, Seq=5, C, H, W)
                 frames_tensor = torch.stack(buffer).unsqueeze(0).to(handler.device)
                 
-                score = handler.predict_sequence(frames_tensor)
+                raw_score = handler.predict_sequence(frames_tensor)
                 
-                # The React frontend threshold defaults to 0.8
-                is_anomaly = score > 0.8
+                # Multiply the score by 10 to increase the value and make the warning less strict,
+                # capping it at 1.0 so frontend percentages don't exceed 100%
+                score = min(float(raw_score) * 5.0, 1.0)
+                
+                # Use dynamic threshold from frontend (defaults to 0.8 if missing)
+                threshold = float(data.get("threshold", 0.8))
+                is_anomaly = score > threshold
                 
                 await websocket.send_json({
                     "score": float(score),
