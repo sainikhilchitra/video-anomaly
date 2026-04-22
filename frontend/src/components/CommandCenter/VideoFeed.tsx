@@ -31,7 +31,7 @@ export function VideoFeed({ onFrame, isAnomaly, prediction, status, sourceType }
     async function startCamera() {
       try {
         stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { width: 640, height: 480, frameRate: 15 } 
+          video: { width: 640, height: 480, frameRate: 15, facingMode: "environment" } 
         });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
